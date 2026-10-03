@@ -1,0 +1,82 @@
+service: reliefpulse-backend
+
+provider:
+  name: aws
+  runtime: nodejs20.x
+  region: ap-south-1
+  environment:
+    TABLE_NAME: reliefpulse-incidents
+    BUCKET_NAME: reliefpulse-evidence-bucket
+    BEDROCK_MODEL_ID: anthropic.claude-3-haiku-20240307-v1:0
+  iam:
+    role:
+      statements:
+        - Effect: Allow
+          Action:
+            - dynamodb:PutItem
+            - dynamodb:GetItem
+            - dynamodb:UpdateItem
+            - dynamodb:Query
+            - dynamodb:Scan
+          Resource: "arn:aws:dynamodb:${aws:region}:${aws:accountId}:table/reliefpulse-incidents*"
+        - Effect: Allow
+          Action:
+            - bedrock:InvokeModel
+          Resource: "*"
+        - Effect: Allow
+          Action:
+            - s3:PutObject
+          Resource: "arn:aws:s3:::reliefpulse-evidence-bucket/*"
+
+functions:
+  triage:
+    handler: src/handlers/triage.handler
+    events:
+      - http:
+          path: /triage
+          method: post
+          cors: true
+
+  createSOS:
+    handler: src/handlers/createSOS.handler
+    events:
+      - http:
+          path: /sos
+          method: post
+          cors: true
+
+  matchVolunteer:
+    handler: src/handlers/matchVolunteer.handler
+    events:
+      - http:
+          path: /match
+          method: post
+          cors: true
+
+resources:
+  Resources:
+    IncidentsTable:
+      Type: AWS::DynamoDB::Table
+      Properties:
+        TableName: reliefpulse-incidents
+        BillingMode: PAY_PER_REQUEST
+        AttributeDefinitions:
+          - AttributeName: PK
+            AttributeType: S
+          - AttributeName: SK
+            AttributeType: S
+        KeySchema:
+          - AttributeName: PK
+            KeyType: HASH
+          - AttributeName: SK
+            KeyType: RANGE
+
+    EvidenceBucket:
+      Type: AWS::S3::Bucket
+      Properties:
+        BucketName: reliefpulse-evidence-bucket
+        CorsConfiguration:
+          CorsRules:
+            - AllowedHeaders: ['*']
+              AllowedMethods: [PUT, POST]
+              AllowedOrigins: ['*']

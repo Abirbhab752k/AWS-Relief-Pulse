@@ -1,0 +1,23 @@
+{
+  "name": "aws-relief-pulse",
+  "version": "1.0.0",
+  "description": "Single-file web app. No build step, no npm install, no server required.",
+  "main": "index.js",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "type": "module",
+  "dependencies": {
+    "@aws-sdk/client-bedrock-runtime": "^3.1146.0",
+    "@aws-sdk/client-dynamodb": "^3.1146.0",
+    "@aws-sdk/client-s3": "^3.1146.0",
+    "@aws-sdk/lib-dynamodb": "^3.1146.0",
+    "@aws-sdk/s3-request-presigner": "^3.1146.0",
+    "@google-cloud/firestore": "^9.3.1",
+    "@google-cloud/storage": "^8.2.0",
+    "@google-cloud/vertexai": "^1.12.0"
+  }
+}
